@@ -45,7 +45,7 @@ class BigFiveResultsTextSerializer
 
   def parse_section(section_name:)
     if @parser.current_line.include?(section_name)
-      overall_score = parse_overall_score(section_name: section_name)
+      overall_score = parse_overall_score
       @parser.next_line
       @parser.next_line
 
@@ -59,7 +59,7 @@ class BigFiveResultsTextSerializer
     end
   end
 
-  def parse_overall_score(section_name: section_name)
+  def parse_overall_score
     # Just get the number from the report
     # i.e. EXTRAVERSION.........74 => 74
     @parser.line_value
