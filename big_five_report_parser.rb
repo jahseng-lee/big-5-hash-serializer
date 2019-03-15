@@ -1,4 +1,6 @@
 class BigFiveReportParser
+  class ParseError < StandardError; end
+
   def initialize(text: text)
     @text = text
   end
@@ -9,10 +11,12 @@ class BigFiveReportParser
 
   def current_line
     @text[0].chomp
+  rescue NoMethodError => e
+    raise ParseError, "Came across unexpected 'nil' value"
   end
 
   def line_label
-    current_line.split(/[\.]+/)[0]
+    label = current_line.split(/[\.]+/)[0]
   end
 
   def line_value

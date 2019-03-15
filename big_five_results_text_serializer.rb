@@ -18,6 +18,49 @@ class BigFiveResultsTextSerializer
     OPENNESS_TO_EXPERIENCE
   ]
 
+  FACETS = {
+    "EXTRAVERSION" => [
+      "Friendliness",
+      "Gregariousness",
+      "Assertiveness",
+      "Activity Level",
+      "Excitement-Seeking",
+      "Cheerfulness"
+    ],
+    "AGREEABLENESS" => [
+      "Trust",
+      "Morality",
+      "Altruism",
+      "Cooperation",
+      "Modesty",
+      "Sympathy"
+    ],
+    "CONSCIENTIOUSNESS" => [
+      "Self-Efficacy",
+      "Orderliness",
+      "Dutifulness",
+      "Achievement-Striving",
+      "Self-Discipline",
+      "Cautiousness"
+    ],
+    "NEUROTICISM" => [
+      "Anxiety",
+      "Anger",
+      "Depression",
+      "Self-Consciousness",
+      "Immoderation",
+      "Vulnerability"
+    ],
+    "OPENNESS TO EXPERIENCE" => [
+      "Imagination",
+      "Artistic Interests",
+      "Emotionality",
+      "Adventurousness",
+      "Intellect",
+      "Liberalism"
+    ]
+  }
+
   def initialize(text:)
     @parser = BigFiveReportParser.new(text: text)
     @report_hash = {}
@@ -31,6 +74,8 @@ class BigFiveResultsTextSerializer
     end
 
     @report_hash
+  rescue BigFiveReportParser::ParseError => e
+    raise InvalidReportError, e.message
   end
 
   private
@@ -47,7 +92,7 @@ class BigFiveResultsTextSerializer
 
       @report_hash[section_name] = {
         "Overall Score" => overall_score,
-        "Facets" => parse_facets
+        "Facets" => parse_facets(section_name: section_name)
       }
     else
       @parser.next_line
@@ -61,13 +106,16 @@ class BigFiveResultsTextSerializer
     @parser.line_value
   end
 
-  def parse_facets
+  def parse_facets(section_name:)
     # For 6 facets, extract the label and number
     # i.e. Friendliness.........74 => "Friendliness": 74
 
     facets = {}
     6.times do
-      facets[@parser.line_label] = @parser.line_value
+      label = @parser.line_label
+
+      raise InvalidReportError, "Invalid facet of #{section_name}: #{label}" unless FACETS[section_name].include?(label)
+      facets[label] = @parser.line_value
 
       @parser.next_line
       @parser.next_line
