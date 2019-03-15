@@ -1,7 +1,7 @@
 class BigFiveReportParser
   class ParseError < StandardError; end
 
-  def initialize(text: text)
+  def initialize(text:)
     @text = text
   end
 

@@ -21,17 +21,17 @@ class BigFiveResultsPoster
       { "EMAIL" => @email }
     )
 
-    results = Net::HTTP.post(
+    response = Net::HTTP.post(
       URI(API_ENDPOINT),
       final_hash.to_json,
       "Content-Type" => "application/json"
     )
 
-    @response_code = results.code
-    if results.code == "201"
-      @token = response.body["receipt_token"]
+    @response_code = response.code
+    if @response_code == "201"
+      @token = response.body
     else
-      @errors = response.body["error_message"]
+      @errors = response.body
     end
   end
 end
