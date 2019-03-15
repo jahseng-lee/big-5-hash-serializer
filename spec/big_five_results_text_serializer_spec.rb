@@ -1,5 +1,5 @@
 require "spec_helper"
-require_relative "../big_five_results_text_serializer"
+require_relative "../lib/big_five_results_text_serializer"
 
 describe BigFiveResultsTextSerializer do
   let(:serializer) { BigFiveResultsTextSerializer.new(text: text) }
