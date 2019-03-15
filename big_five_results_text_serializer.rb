@@ -44,10 +44,7 @@ class BigFiveResultsTextSerializer
   end
 
   def parse_section(section_name:)
-    if @parser.current_line[/#{section_name}/].nil?
-      @parser.next_line
-      parse_section(section_name: section_name)
-    else
+    if @parser.current_line.include?(section_name)
       overall_score = parse_overall_score(section_name: section_name)
       @parser.next_line
       @parser.next_line
@@ -56,13 +53,16 @@ class BigFiveResultsTextSerializer
         "Overall Score" => overall_score,
         "Facets" => parse_facets
       }
+    else
+      @parser.next_line
+      parse_section(section_name: section_name)
     end
   end
 
   def parse_overall_score(section_name: section_name)
     # Just get the number from the report
     # i.e. EXTRAVERSION.........74 => 74
-    @parser.current_line.split(/[\.]+/)[1].to_i
+    @parser.line_value
   end
 
   def parse_facets
@@ -71,8 +71,7 @@ class BigFiveResultsTextSerializer
 
     facets = {}
     6.times do
-      parsed_line = @parser.current_line.split(/[\.]+/)
-      facets[parsed_line[0]] = parsed_line[1].to_i
+      facets[@parser.line_label] = @parser.line_value
 
       @parser.next_line
       @parser.next_line
